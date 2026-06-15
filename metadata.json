@@ -1,0 +1,6 @@
+{
+  "name": "P2P WebRTC File Transfer",
+  "description": "High-speed, secure, direct browser-to-browser file sharing using WebRTC without server storage.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

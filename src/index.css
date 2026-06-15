@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cyber-dark: #0C0C0E;
+  --color-cyber-card: #121214;
+  --color-cyber-panel: #0E0E10;
+  --color-cyber-black: #080809;
+  --color-cyber-border: #27272A;
+  --color-text-main: #E0E0E6;
+}
+
+body {
+  background-color: #0C0C0E;
+  color: #E0E0E6;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+}
+
+/* Custom retro scrollbar styling for technical dashboard logs */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #0E0E10;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272A;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3F3F46;
+}
+
