@@ -652,7 +652,7 @@ export default function App() {
                   <div className="flex items-start gap-2">
                     <span className="px-1 py-0.5 rounded bg-[#1C1C20] border border-[#27272A] text-[8px] font-bold text-indigo-400">P2P</span>
                       <p className="tracking-tight text-zinc-500">
-                      Bypasses cloud servers entirely. Files stream directly between devices.
+                      Bypasses cloud servers entirely. Files stream directly between device memories.
                     </p>
                   </div>
                   <div className="flex items-start gap-2">
