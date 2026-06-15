@@ -41,3 +41,30 @@ jobs:
             --region ${{ secrets.CLOUD_RUN_REGION }} \
             --platform managed \
             --allow-unauthenticated
+
+      - name: Capture Cloud Run URL
+        env:
+          GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+          CLOUD_RUN_SERVICE: ${{ secrets.CLOUD_RUN_SERVICE }}
+          CLOUD_RUN_REGION: ${{ secrets.CLOUD_RUN_REGION }}
+        run: |
+          CLOUD_RUN_URL=$(gcloud run services describe "$CLOUD_RUN_SERVICE" --project "$GCP_PROJECT" --region "$CLOUD_RUN_REGION" --format='value(status.url)')
+          echo "CLOUD_RUN_URL=$CLOUD_RUN_URL" >> $GITHUB_ENV
+
+      - name: Update Vercel APP_URL and trigger redeploy
+        if: ${{ secrets.VERCEL_TOKEN && secrets.VERCEL_PROJECT_ID }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          CLOUD_RUN_URL: ${{ env.CLOUD_RUN_URL }}
+        run: |
+          echo "Updating Vercel APP_URL to: $CLOUD_RUN_URL"
+          existing=$(curl -s -H "Authorization: Bearer $VERCEL_TOKEN" "https://api.vercel.com/v9/projects/${VERCEL_PROJECT_ID}/env")
+          env_id=$(echo "$existing" | jq -r '.envs[]? | select(.key=="APP_URL") | .id' || true)
+          if [ -n "$env_id" ] && [ "$env_id" != "null" ]; then
+            curl -s -X PATCH -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" "https://api.vercel.com/v9/projects/${VERCEL_PROJECT_ID}/env/${env_id}" -d "{\"value\":\"$CLOUD_RUN_URL\"}"
+          else
+            curl -s -X POST -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" "https://api.vercel.com/v9/projects/${VERCEL_PROJECT_ID}/env" -d "{\"key\":\"APP_URL\",\"value\":\"$CLOUD_RUN_URL\",\"target\":[\"production\"],\"type\":\"encrypted\"}"
+          fi
+          # Trigger a Vercel production deployment
+          npx vercel --prod --token $VERCEL_TOKEN --confirm
